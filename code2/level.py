@@ -6,12 +6,20 @@ from enemy import Enemy
 from decoration import Sky, Water, Clouds
 from player import Player
 from particles import ParticleEffect
+from game_data import levels
 
 class Level:
-    def __init__(self, level_data):
+    def __init__(self, current_level, create_overworld):
         self.display_surface = pygame.display.get_surface()
         self.world_shift = 0
         self.current_x = None
+
+        # overworld connection
+        self.create_overworld = create_overworld
+        self.current_level = current_level
+
+        level_data = levels[self.current_level]
+        self.new_max_level = level_data['unlock']
 
         # player
         player_layout = import_csv_layout(level_data['player'])
@@ -213,6 +221,14 @@ class Level:
             fall_dust_particle = ParticleEffect(pos, 'land')
             self.dust_sprite.add(fall_dust_particle)
 
+    def check_death(self):
+        if self.player.sprite.rect.top > screen_height:
+            self.create_overworld(self.current_level, 0)
+
+    def check_win(self):
+        if pygame.sprite.spritecollide(self.player.sprite, self.goal, False):
+            self.create_overworld(self.current_level, self.new_max_level)
+
     def run(self):
         # decoration
         self.sky.draw(self.display_surface)
@@ -259,6 +275,9 @@ class Level:
         self.goal.update(self.world_shift)
         self.goal.draw(self.display_surface)
         self.scroll_x()
+        
+        self.check_death()
+        self.check_win()
 
         # dust particles
         self.dust_sprite.update(self.world_shift)

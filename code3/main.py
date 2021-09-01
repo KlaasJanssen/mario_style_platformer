@@ -1,12 +1,13 @@
-import pygame, sys
+import sys, pygame
 from settings import *
-from level import Level
 from overworld import Overworld
+from level import Level
+
 
 class Game:
     def __init__(self):
-        self.max_level = 0
-        self.overworld = Overworld(0, self.max_level, self.create_level)
+        self.max_level = 3
+        self.overworld = Overworld(1, self.max_level, self.create_level)
         self.status = 'overworld'
 
 
@@ -26,12 +27,14 @@ class Game:
         else:
             self.level.run()
 
+
+
+
 pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
 clock = pygame.time.Clock()
+
 game = Game()
-
-
 
 while True:
     for event in pygame.event.get():
@@ -39,7 +42,7 @@ while True:
             pygame.quit()
             sys.exit()
 
-    screen.fill('grey')
+    screen.fill('black')
     game.run()
 
     pygame.display.update()
